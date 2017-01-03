@@ -26,11 +26,11 @@ var cons = new HighLevelConsumer(client,config.payload,config.opt)
 cons.on('message',function(mes){
     var sip;
     try {
-        sip = mes.value.match(/"s_ip": "(.+)",/)[1]
+        sip = mes.value.match(/"s_ip": "([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)",/)[1]
     }catch(e){
         sip = "unknow server"
     }
-    logger.info("get message of topic:"+(mes&&mes.topic)||"unknow"+" from "+ sip)
+    logger.info("get message of topic:"+((mes&&mes.topic)||"unknow")+" from "+ sip)
     controller.write(mes)
 })
 

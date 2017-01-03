@@ -24,7 +24,17 @@ function insert(mes){
         logger.error("illegal message")
         return 0
     }
-    var json = JSON.parse(mes.value)
+    var json;
+    try{
+        json = JSON.parse(mes.value)
+    }catch(e){
+        logger.error("illegal message")
+        return 0
+    }
+    if(!j instanceof Object){
+        logger.error("illegal message")
+        return 0
+    }
     var data;
     if(json instanceof Array){
         data = json
@@ -48,12 +58,13 @@ function insert(mes){
     }
 
     var MongoClient = mongo.MongoClient;
-    MongoClient.connect(config.mongo_addr, function (err, db) {
+    MongoClient.connect(config.mongo_addr,config.mongo_option, function (err, db) {
         if(!err){
             db.collection(table,function(err,tb){
                 if(!err){
                     tb.insert(data,function(err,res){
                         if(!err){
+                            db.close()
                             return 0
                         }else{
                             return 5
@@ -64,7 +75,6 @@ function insert(mes){
                     return 4
                 }
             })
-
         }else{
             logger.error(err)
             return 3
@@ -84,11 +94,11 @@ var write = function(mes){
     }else{
         var sip;
         try {
-            sip = mes.value.match(/"s_ip": "(.+)",/)[1]
+            sip = mes.value.match(/"s_ip": "([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)",/)[1]
         }catch(e){
             sip = "unknow server"
         }
-        logger.info("success topic:"+(mes&&mes.topic)||'unknow'+" from "+ sip)
+        logger.info("success topic:"+((mes&&mes.topic)||'unknow')+" from "+ sip)
     }
 }
 
