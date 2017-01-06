@@ -31,7 +31,7 @@ function insert(mes){
         logger.error("illegal message")
         return 0
     }
-    if(!j instanceof Object){
+    if(!json instanceof Object){
         logger.error("illegal message")
         return 0
     }
