@@ -24,6 +24,11 @@ var HighLevelConsumer = kafka.HighLevelConsumer
 var client = new kafka.Client(config.zk_addr)
 var cons = new HighLevelConsumer(client,config.payload,config.opt)
 cons.on('message',function(mes){
+    if(mes.topic && mes.topic == 'users'){
+        if(mes.value.indexOf('users')==-1){
+            return
+        }
+    }
     var sip;
     try {
         sip = mes.value.match(/"s_ip": "([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)",/)[1]

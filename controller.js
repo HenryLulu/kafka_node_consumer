@@ -47,10 +47,10 @@ function insert(mes){
     }
     switch (mes.topic){
         case 'logs':
-            table = 'log_table';
+            table = 'ori_node';
             break;
         case 'users':
-            table = 'user_table';
+            table = 'ori_user';
             break;
         default:
             logger.error("unknow topic")
