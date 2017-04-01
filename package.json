@@ -6,8 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "pm2 start ./app.js --name consumer -i 12 --output /data/pm2/server.log --error /data/pm2/error.log",
-    "re": "pm2 reload consumer",
-    "log": "pm2 logs consumer",
+    "reload": "pm2 reload consumer",
+    "logs": "pm2 logs consumer",
     "stop": "pm2 stop consumer"
   },
   "author": "",
