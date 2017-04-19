@@ -35,7 +35,7 @@ cons.on('message',function(mes){
     }catch(e){
         sip = "unknow server"
     }
-    logger.info("get message of topic:"+((mes&&mes.topic)||"unknow")+" from "+ sip)
+    //logger.info("get message of topic:"+((mes&&mes.topic)||"unknow")+" from "+ sip)
     controller.write(mes)
 })
 

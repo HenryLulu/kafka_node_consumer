@@ -18,22 +18,22 @@ var logger = log4js.getLogger();
 
 var config = require("./config");
 
-function insert(mes){
+function insert(mes, cb){
     var table;
     if(!mes.topic||!mes.value){
         logger.error("illegal message")
-        return 0
+        cb(0)
     }
     var json;
     try{
         json = JSON.parse(mes.value)
     }catch(e){
         logger.error("illegal message")
-        return 0
+        cb(0)
     }
     if(!json instanceof Object){
         logger.error("illegal message")
-        return 0
+        cb(0)
     }
     var data;
     if(json instanceof Array){
@@ -43,7 +43,7 @@ function insert(mes){
     }
     if(data.length==0){
         logger.warn("empty message")
-        return 0
+        cb(0)
     }
     switch (mes.topic){
         case 'logs':
@@ -54,7 +54,7 @@ function insert(mes){
             break;
         default:
             logger.error("unknow topic")
-            return 0
+            cb(0)
     }
 
     var MongoClient = mongo.MongoClient;
@@ -65,41 +65,38 @@ function insert(mes){
                     tb.insert(data,function(err,res){
                         if(!err){
                             db.close()
-                            return 0
+                            cb(0)
                         }else{
-                            return 5
+                            logger.error(err)
+                            cb(5)
                         }
                     });
                 }else{
                     logger.error(err)
-                    return 4
+                    cb(4)
                 }
             })
         }else{
             logger.error(err)
-            return 3
+            cb(3)
         }
     })
 }
 
 var write = function(mes){
-    var retry_time = 10;
-    var res = 1;
-    while(res&&retry_time>0){
-        retry_time -= 1
-        res = insert(mes)
-    }
-    if(retry_time==0){
-        logger.error("insert mongo error and retried fail")
-    }else{
-        var sip;
-        try {
-            sip = mes.value.match(/"s_ip": "([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)",/)[1]
-        }catch(e){
-            sip = "unknow server"
+    insert(mes, function(res){
+        if(!res){
+            var sip;
+            try {
+                sip = mes.value.match(/"s_ip": "([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)",/)[1]
+            }catch(e){
+                sip = "unknow server"
+            }
+            logger.info("success topic:"+((mes&&mes.topic)||'unknow')+" from "+ sip)
+        }else{
+            logger.error("fail to insert mongo")
         }
-        logger.info("success topic:"+((mes&&mes.topic)||'unknow')+" from "+ sip)
-    }
+    })
 }
 
 exports.write = write
